@@ -1,0 +1,36 @@
+{
+  "name": "dagre-for-react",
+  "version": "1.0.0",
+  "description": "关系图",
+  "main": "lib/index.js",
+  "scripts": {
+    "start": "glue start",
+    "compile": "rm -rf ./lib && babel src/modules --out-dir lib --copy-files"
+  },
+  "keywords": [
+    "dagre",
+    "graph",
+    "three",
+    "threejs",
+    "three.js",
+    "react"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:okmengzhilin/dagre-for-react.git"
+  },
+  "author": "Zhou Xianglin",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.10.1",
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
+    "glue-core": "0.0.4"
+  },
+  "dependencies": {
+    "react": "16.13.0",
+    "react-dom": "16.13.0",
+    "dagre": "^0.8.4",
+    "three": "^0.110.0"
+  }
+}
