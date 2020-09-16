@@ -17,7 +17,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:okmengzhilin/dagre-for-react.git"
+    "url": "git+ssh://git@github.com/okmengzhilin/dagre-for-react.git"
   },
   "author": "Zhou Xianglin",
   "license": "ISC",
@@ -32,5 +32,12 @@
     "react-dom": "16.13.0",
     "dagre": "^0.8.4",
     "three": "^0.110.0"
+  },
+  "bugs": {
+    "url": "https://github.com/okmengzhilin/dagre-for-react/issues"
+  },
+  "homepage": "https://github.com/okmengzhilin/dagre-for-react#readme",
+  "directories": {
+    "lib": "lib"
   }
 }
