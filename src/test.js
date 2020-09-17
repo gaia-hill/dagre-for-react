@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
-import { DagreGraphComponent, dagreGraphInit } from '../lib/index'
+import { DagreGraphComponent, dagreGraphInit } from './modules/index'
 
 class Index extends Component {
 	constructor(props) {

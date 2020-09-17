@@ -1,6 +1,6 @@
 {
   "name": "dagre-for-react",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "关系图",
   "main": "lib/index.js",
   "scripts": {
@@ -28,9 +28,9 @@
     "glue-core": "0.0.4"
   },
   "dependencies": {
+    "dagre": "^0.8.4",
     "react": "16.13.0",
     "react-dom": "16.13.0",
-    "dagre": "^0.8.4",
     "three": "^0.110.0"
   },
   "bugs": {

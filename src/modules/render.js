@@ -249,11 +249,12 @@ export const focus = (id) => {
 	for (let i = 0; i < scene.children.length; i++) {
 		const object = scene.children[i];
 		if (object.meshType === "node" && object.nodeInfo['id'] === id) {
-			const threeBox = document.querySelector("#three-container")
+			const threeBox = document.querySelector("#three-container canvas")
 			const { x, y } = threeBox.getBoundingClientRect()
 			const start = getScreenPointerByWorld(object.position, camera)
+			console.log(x,y,start)
 			controls.panEnd = vector2Temp.clone().set(x + threeBox.offsetWidth / 2, y + threeBox.offsetHeight / 2)
-			controls.panStart =  vector2Temp.clone().set(start.x, start.y)
+			controls.panStart =  vector2Temp.clone().set(start.x + x, start.y + y)
 			controls.panDelta.subVectors(controls.panEnd, controls.panStart).multiplyScalar( controls.panSpeed )
 			controls.pan( controls.panDelta.x, controls.panDelta.y )
 			controls.panStart.copy( controls.panEnd )

@@ -6,7 +6,7 @@ import initRender, { initColor, rerender, activeTargetNodes, findRelateNodes, fo
 export const DagreGraphComponent = (props) => {
 	const style = {
 		height: props.height || '100%',
-		width: props.width || '100%',
+		width: props.width || '100%'
 	}
 	useEffect(() => {
 		const dom = document.querySelector('.dagre-graph-container')
