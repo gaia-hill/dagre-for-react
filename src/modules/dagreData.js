@@ -3,7 +3,7 @@ import dagre from 'dagre'
 
 let canvas = document.createElement("canvas")
 let context = canvas.getContext("2d")
-context.font = '70px Consolas'
+context.font = '70px sans-serif'
 
 export default class DagreData {
 
@@ -25,7 +25,7 @@ export default class DagreData {
 				label: node.label,
 				id: nodeId,
 				width: context.measureText(node.label).width + 80,
-				height: 80 + 40,
+				height: 80 + 48,
 				property: node,
 				nodeType: node.id === data.mainNode ? 'main' : 'static'
 			})

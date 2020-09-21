@@ -189,7 +189,7 @@ dagre 的布局配置，具体的配置参考链接中 graph 的配置<https://g
 
 #### - graph.zoom(level)
 
-设置关系图的缩放级别，level 为 minZoom - maxZoom 之间的值
+设置关系图的缩放级别，level 为 minZoom - maxZoom 之间的值，当不传level时，zoom返回当前的缩放级别
 
 #### - graph.reset()
 

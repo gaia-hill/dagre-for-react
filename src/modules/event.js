@@ -63,7 +63,7 @@ export default (scene, camera, defaultOptions) => {
 			mouseVector.set(mouse.mouseX, mouse.mouseY)
 			raycaster.setFromCamera( mouseVector, camera )
 			let intersects = raycaster.intersectObjects( scene.children )   // 获取点击位置场景中的对象
-			let meshArr = intersects.filter(node=>node.object.meshType==="node")
+			let meshArr = intersects.filter(node=>node.object.meshType==="label")
 			let selectedNodes = meshArr.map(node=>node.object.nodeInfo)
 
 			if(selectedNodes.length>0){   // 如果有点击对象
@@ -84,7 +84,7 @@ export default (scene, camera, defaultOptions) => {
 		raycaster.setFromCamera( mouseVector, camera )
 
 		let intersects = raycaster.intersectObjects( scene.children )
-		let meshArr = intersects.filter(node=>node.object.meshType==="node")
+		let meshArr = intersects.filter(node=>node.object.meshType==="label")
 		let selectedNodes = meshArr.map(node=>node.object.nodeInfo)
 		if(selectedNodes.length>0){
 			let {x, y} = getNodeScreenPointer(meshArr[0], camera)
@@ -104,7 +104,7 @@ export default (scene, camera, defaultOptions) => {
 		mouseVector.set(mouse.mouseX, mouse.mouseY)
 		raycaster.setFromCamera( mouseVector, camera )
 		let intersects = raycaster.intersectObjects( scene.children )
-		let meshArr = intersects.filter(node=>node.object.meshType==="node")
+		let meshArr = intersects.filter(node=>node.object.meshType==="label")
 		let selectedNodes = meshArr.map(node=>node.object.nodeInfo)
 		if(selectedNodes.length>0){
 			let {x, y} = getNodeScreenPointer(meshArr[0], camera)

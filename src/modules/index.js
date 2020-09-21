@@ -67,6 +67,9 @@ export const dagreGraphInit = (options) => {
 				reset(layoutData)
 			},
 			zoom: (level) => {
+				if (level === undefined) {
+					return zoom()
+				}
 				if (defaultOptions.minZoom <= level && level <= defaultOptions.maxZoom) {
 					zoom(level)
 				} else {

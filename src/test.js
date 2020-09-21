@@ -6,52 +6,53 @@ class Index extends Component {
 	constructor(props) {
 		super(props)
 		this.config = {
-			zoom: 0.3,
+			zoom: 0.15,
 			minZoom: 0.01,
 			maxZoom: 1.5,
 			height: '700px',
 			width: '900px',
 			layoutConfig: {},
 			theme: {
-				mainNode: "#FFFFFF",
-				mainBkg: "#2E86C1",
+				mainNode: '#FFFFFF',
+				mainBkg: '#658FFC',
 
-				activeNode: "#658FFC",
-				activeBkg: "#EFF3FF",
+				activeNode: '#658FFC',
+				activeBkg: '#EFF3FF',
 
-				staticNode: "#273746",
-				staticBkg: "#ABB2B9",
+				staticNode: '#3ECEB4',
+				staticBkg: '#EFFFFC',
 
-				senceBackground: '#FDEDEC',
+				senceBackground: '#FAFAFA',
 				edgeColor: "#CACFD2"
 			},
 			data: {
-				mainNode: '4',
+				mainNode: 'rpt_dmetadata_tb_da',
 				nodes: [
-					{ label: 'test1', id: '1' },
-					{ label: 'test2', id: '2' },
-					{ label: 'test3', id: '3' },
-					{ label: 'test4', id: '4' },
-					{ label: 'test5', id: '5' },
-					{ label: 'test6', id: '6' },
-					{ label: 'test7', id: '7' },
-					{ label: 'test8', id: '8' },
-					{ label: 'test9', id: '9' },
-					{ label: 'test10', id: '10' },
-					{ label: 'test11', id: '11' }
+					{ label: 'DG-表Dmeta信息', id: 'dw_dg_tec_tbl_dmeta_da' },
+					{ label: '人店中台-基础明细-经纪人-经纪人明细表', id: 'olap_shh_agent_personnel_base_da' },
+					{ label: '管理平台DB表', id: 'stg_dmetadata_tb_db' },
+					{ label: '元数据表基本信息', id: 'rpt_dmetadata_tb_da' },
+					{ label: 'hive表各分区大小信息', id: 'ods_hive_table_partiton_pt_da' },
+					{ label: '大数据权限系统角色权限表', id: 'rpt_bigdata_role_auth_da' },
+					{ label: '大数据权限系统员工申请权限表', id: 'rpt_bigdata_employee_auth_da' },
+					{ label: 'Hive表Adhoc使用热度明细基础', id: 'rpt_hive_tb_adhoc_query_da' },
+					{ label: '资产管理_数据表_表查询明细表', id: 'rpt_am_table_table_query_detail_da' },
+					{ label: 'ADHOC热门应用Hive表动态月排行表', id: 'olap_bigdata_adhoc_table_rank_di' },
+					{ label: '数据应用组权限开放清单', id: 'rpt_shh_property_auth_list_da' },
 				],
+
 				edges: [
-					{ source: '1', target: '4' },
-					{ source: '2', target: '4' },
-					{ source: '3', target: '4' },
-					{ source: '4', target: '5' },
-					{ source: '4', target: '6' },
-					{ source: '4', target: '7' },
-					{ source: '7', target: '8' },
-					{ source: '7', target: '9' },
-					{ source: '7', target: '10' },
-					{ source: '11', target: '2' }
-				],
+					{ source: 'dw_dg_tec_tbl_dmeta_da', target: 'rpt_dmetadata_tb_da' },
+					{ source: 'olap_shh_agent_personnel_base_da', target: 'rpt_dmetadata_tb_da' },
+					{ source: 'stg_dmetadata_tb_db', target: 'rpt_dmetadata_tb_da' },
+					{ source: 'ods_hive_table_partiton_pt_da', target: 'rpt_dmetadata_tb_da' },
+					{ source: 'rpt_dmetadata_tb_da', target: 'rpt_bigdata_role_auth_da' },
+					{ source: 'rpt_dmetadata_tb_da', target: 'rpt_bigdata_employee_auth_da' },
+					{ source: 'rpt_dmetadata_tb_da', target: 'rpt_hive_tb_adhoc_query_da' },
+					{ source: 'rpt_hive_tb_adhoc_query_da', target: 'rpt_am_table_table_query_detail_da' },
+					{ source: 'rpt_bigdata_employee_auth_da', target: 'olap_bigdata_adhoc_table_rank_di' },
+					{ source: 'rpt_bigdata_employee_auth_da', target: 'rpt_shh_property_auth_list_da' },
+				]
 			},
 			onNodeHover: ({ x, y, node }) => {
 				// console.log('当前hover节点', x, y, node)
@@ -69,17 +70,25 @@ class Index extends Component {
 	}
 
 	render() {
+		const btnStyle = { marginLeft: '10px' }
 		return (
 			<React.Fragment>
 				<DagreGraphComponent {...this.config} onInit={(graph) => this.graph = graph} />
 				<button onClick={() => this.graph.reset()}>重置</button>
-				<button onClick={() => this.graph.focus('7')}>聚焦到test7</button>
-				<button onClick={() => this.graph.zoom(0.1)}>缩放到0.1</button>
-				<button onClick={() => {
-					let nodes = this.graph.findRelateNodes('7')
+				<button style={btnStyle} onClick={() => {
+					let currentZoom = this.graph.zoom()
+					this.graph.zoom(currentZoom - 0.1)
+				}}>缩小</button>
+				<button style={btnStyle} onClick={() => {
+					let currentZoom = this.graph.zoom()
+					this.graph.zoom(currentZoom + 0.1)
+				}}>放大</button>
+				<button style={btnStyle} onClick={() => this.graph.focus('rpt_bigdata_employee_auth_da')}>聚焦到（大数据权限系统员工申请权限表）</button>
+				<button style={btnStyle} onClick={() => {
+					let nodes = this.graph.findRelateNodes('rpt_bigdata_employee_auth_da')
 					console.log(nodes)
 					this.graph.activeTargetNodes(nodes.map(node => node.nodeInfo.id))
-				}}>查找test7关联节点，并高亮</button>
+				}}>查找（大数据权限系统员工申请权限表）关联节点，并高亮</button>
 			</React.Fragment>
 		)
 	}

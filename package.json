@@ -1,6 +1,6 @@
 {
   "name": "dagre-for-react",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "关系图",
   "main": "lib/index.js",
   "scripts": {

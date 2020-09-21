@@ -6,14 +6,10 @@ loadMapContral(THREE)
 
 let props = {}
 let renderer, camera, controls, scene;
-let arrowLineMaterial;
-let canvasWidth = 512
-let canvasHeight = 512
-let textPositionMap = {}
+let arrowLineMaterial
 let nodeTypes = ['main', 'static', 'active']
-let canvasList = nodeTypes.map(type => document.createElement('canvas'))
 let materialList = []
-const nodeMaterialMap = {}
+const labelMaterialMap = {}
 const borderMateralMap = {}
 const clock = new THREE.Clock()
 let fps = 5
@@ -49,55 +45,11 @@ document.addEventListener('mousemove', (e) => {
 
 //   公用对象
 let meshTemp = new THREE.Mesh()
-let groupTemp = new THREE.Group()
 let vector2Temp = new THREE.Vector2()
 let lineTemp = new THREE.Line()
 let geometryTemp = new THREE.BufferGeometry()
 let vector3Temp = new THREE.Vector3()
 
-
-canvasList.forEach(canvas => {
-	canvas.width = canvasWidth
-	canvas.height = canvasHeight
-})
-function getLabel(layout_data) {
-	let labelSet = new Set()
-	let { nodes } = layout_data
-	let ctxList = canvasList.map((canvas, index) => canvas.getContext('2d'))
-	ctxList.forEach((ctx, index) => {
-		let type = nodeTypes[index]
-		ctx.clearRect(0, 0, canvasWidth, canvasHeight)
-		ctx.fillStyle = props.nodeColor[type + 'Bkg']
-		ctx.fillRect(0, 0, canvasWidth, canvasHeight)
-		ctx.font = "70px Consolas"
-		ctx.fillStyle = props.nodeColor[type]
-		ctx.textBaseline = 'top'
-	})
-	const fontSize = 70
-	const padding = 20
-	nodes.forEach((node) => {
-		for (let i = 0; i < node.label.length; i++) {
-			labelSet.add(node.label[i])
-		}
-	})
-	let x = padding, y = padding
-	for (let text of labelSet) {
-		let width = ctxList[0].measureText(text).width
-		let height = fontSize
-		if (x + width > canvasWidth) {
-			y += fontSize + padding
-			x = padding
-		}
-		textPositionMap[text] = { x, y, width, height }
-		ctxList.forEach(ctx => ctx.fillText(text, x, y))
-		x += width + padding
-	}
-	materialList = canvasList.map((canvas, index) => {
-		let material = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(canvas) })
-		material.transparent = false
-		return material
-	})
-}
 export default (defaultOptions) => {   // 初始化threejs场景
 	initScene()
 	bindEvent(scene, camera, defaultOptions)  //  绑定图中的交互事件
@@ -165,7 +117,6 @@ export const rerender = (layoutData, toOrigin) => {
 		scene.remove(scene.children[0])
 	}
 	scene.dispose()
-	getLabel(layoutData)
 	drawNode(layoutData)
 	drawLine(layoutData)
 	if (toOrigin) {
@@ -179,7 +130,7 @@ export const findRelateNodes = (active_id) => {
 	scene.children.forEach((object) => {
 
 		// 如果是当前点击的节点，放到active数组中，如果非点击节点重置样式
-		if (object.meshType === "node" && object.nodeInfo['id'] === active_id) {
+		if (object.meshType === "label" && object.nodeInfo['id'] === active_id) {
 			active_nodes.push(object)
 		}
 		// 获取和点击节点相关的edge连接的节点，包括上游和下游
@@ -206,13 +157,13 @@ export const activeTargetNodes = (active_list) => {
 	let active_nodes = []
 	scene.children.forEach((object) => {
 		// 如果包含该节点，放到active数组中，否则重置样式
-		if (object.meshType === "node" && active_list.includes(object.nodeInfo['id'])) {
+		if (object.meshType === "label" && active_list.includes(object.nodeInfo['id'])) {
 			active_nodes.push(object)
-		} else if (object.meshType === "node") {
+		} else if (object.meshType === "label") {
 			let node = object.nodeInfo
 			let color = node.nodeType === "main" ? props.nodeColor["main"] : props.nodeColor["static"]
 			let backgroundColor = node.nodeType === "main" ? props.nodeColor["mainBkg"] : props.nodeColor["staticBkg"]
-			object.material = drawNodeMaterial(object.nodeInfo, color, backgroundColor)
+			object.material = drawLableMaterial(object.nodeInfo, color, backgroundColor)
 		}
 	})
 	changeNodeStyle(active_nodes)
@@ -220,12 +171,12 @@ export const activeTargetNodes = (active_list) => {
 
 function changeNodeStyle(active_nodes) {
 	// 设置活跃节点的样式，就是变色，但是需要重新绘制节点的材质
-	let groups = scene.children.filter(object => object.meshType === 'label')
-	let lines = scene.children.filter(object => object.meshType === 'line')
+	let nodes = scene.children.filter(object => object.meshType === 'label')
+	let borders = scene.children.filter(object => object.meshType === 'border')
 	active_nodes.forEach((object) => {
-		object.material = drawNodeMaterial(object.nodeInfo, props.nodeColor['active'], props.nodeColor['activeBkg'])
+		object.material = drawLableMaterial(object.nodeInfo, props.nodeColor['active'], props.nodeColor['activeBkg'])
 	})
-	groups.forEach(group => {
+	nodes.forEach(group => {
 		let isActive = active_nodes.some(obj => obj.nodeInfo['id'] === group.nodeInfo['id'])
 		group.children.forEach(child => {
 			let type = isActive ? 'active' : getNodeType(group.nodeInfo)
@@ -233,11 +184,11 @@ function changeNodeStyle(active_nodes) {
 			child.material = materialList[typeIndex]
 		})
 	})
-	lines.forEach(line => {
-		let isActive = active_nodes.some(obj => obj.nodeInfo['id'] === line.nodeInfo['id'])
-		let type = isActive ? 'active' : getNodeType(line.nodeInfo)
+	borders.forEach(border => {
+		let isActive = active_nodes.some(obj => obj.nodeInfo['id'] === border.nodeInfo['id'])
+		let type = isActive ? 'active' : getNodeType(border.nodeInfo)
 		let color = props.nodeColor[type]
-		line.material = getBorderLineMaterial(color)
+		border.material = getBorderLineMaterial(color)
 	})
 }
 
@@ -248,11 +199,10 @@ export const reset = (layoutData) => {
 export const focus = (id) => {
 	for (let i = 0; i < scene.children.length; i++) {
 		const object = scene.children[i];
-		if (object.meshType === "node" && object.nodeInfo['id'] === id) {
+		if (object.meshType === "label" && object.nodeInfo['id'] === id) {
 			const threeBox = document.querySelector("#three-container canvas")
 			const { x, y } = threeBox.getBoundingClientRect()
 			const start = getScreenPointerByWorld(object.position, camera)
-			console.log(x,y,start)
 			controls.panEnd = vector2Temp.clone().set(x + threeBox.offsetWidth / 2, y + threeBox.offsetHeight / 2)
 			controls.panStart =  vector2Temp.clone().set(start.x + x, start.y + y)
 			controls.panDelta.subVectors(controls.panEnd, controls.panStart).multiplyScalar( controls.panSpeed )
@@ -265,16 +215,12 @@ export const focus = (id) => {
 }
 
 export const zoom = (level) => {
-	camera.zoom = level
-	camera.updateProjectionMatrix()
-}
-
-export const drawNodeMaterial = (node, color, backgroundColor) => {
-	const type = color + backgroundColor
-	if (!nodeMaterialMap[type]) {
-		nodeMaterialMap[type] = new THREE.MeshBasicMaterial({ color: backgroundColor })
+	if (level) {
+		camera.zoom = level
+		camera.updateProjectionMatrix()
+		return
 	}
-	return nodeMaterialMap[type]
+	return camera.zoom
 }
 
 // 初始化threejs场景
@@ -301,73 +247,22 @@ function drawNode(layout_data) {
 		// 手动绘制文字
 		let color = node.nodeType === "main" ? props.nodeColor['main'] : props.nodeColor["static"]
 		let backgroundColor = node.nodeType === "main" ? props.nodeColor["mainBkg"] : props.nodeColor["staticBkg"]
-		let nodeType = getNodeType(node)
-		let typeIndex = nodeTypes.indexOf(nodeType)
-		var nodeMaterial = drawNodeMaterial(node, color, backgroundColor)
-		let nodeMesh = meshTemp.clone()
-		nodeMesh.geometry = nodeGeometry
-		nodeMesh.material = nodeMaterial
-		nodeMesh.position.x = node.x + centerX
-		nodeMesh.position.y = node.y + centerY
-		nodeMesh.position.z = 0;
-		nodeMesh.nodeInfo = node
-		nodeMesh.rotation.z = Math.PI  //  这一块如果不在z轴旋转180度，文字是倒立的
-		nodeMesh.meshType = 'node'
-		nodeMesh.material.depthTest = false
-		nodeMesh.renderOrder = 2
-		scene.add(nodeMesh);
 
-		let group = groupTemp.clone()
-		group.nodeInfo = node
-		group.meshType = 'label'
-		let startX = node.x
-		let avgWidth = (node.width - 50) / node.label.length
-		function getVector(x, y) {
-			x = x / canvasWidth,
-				y = (canvasHeight - y) / canvasHeight
-			let point = vector2Temp.clone()
-			point.x = x
-			point.y = y
-			return point
-		}
-		for (let i = 0; i < node.label.length; i++) {
-			let text = node.label[i]
-			let textPosition = textPositionMap[text]
-			let { x, y, width, height } = textPosition
-			let padding = 1
-			let ypadding = 3
-			if (width < avgWidth) {
-				padding = (avgWidth - width) / 2
-			}
-			let labelGeometry = new THREE.BoxGeometry(avgWidth, height, 0)
-			let labelUv = [
-				getVector(x + width + padding, y + height + ypadding), // 右下
-				getVector(x + width + padding, y - ypadding), //右上
-				getVector(x - padding, y - ypadding), //左上
-				getVector(x - padding, y + height + ypadding), //左下
-			]
-			// 左下 左右  右上 右下
-			// 参考文章：https://techbrood.com/zh/news/webgl/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3three_js%E7%BA%B9%E7%90%86%E8%B4%B4%E5%9B%BE%E5%92%8Cuv%E6%98%A0%E5%B0%84.html
-			//顶面两个三角形
-			// labelGeometry.faceVertexUvs[0] = []
-			labelGeometry.faceVertexUvs[0][10] = [labelUv[0], labelUv[1], labelUv[3]]
-			labelGeometry.faceVertexUvs[0][11] = [labelUv[1], labelUv[2], labelUv[3]]
-			let labelMesh = meshTemp.clone()
-			labelMesh.geometry = labelGeometry
-			labelMesh.material = materialList[typeIndex]
-			labelMesh.position.x = startX + centerX - node.width / 2 + 40
-			labelMesh.position.y = node.y + centerY
-			labelMesh.position.z = 0
-			labelMesh.depthTest = false
-			startX += avgWidth
-			group.add(labelMesh)
-		}
-		group.renderOrder = 3
-		scene.add(group)
+		let labelMesh = meshTemp.clone()
+		labelMesh.geometry = nodeGeometry
+		labelMesh.material = drawLableMaterial(node, color, backgroundColor)
+		labelMesh.position.x = node.x + centerX
+		labelMesh.position.y = node.y + centerY
+		labelMesh.position.z = 0;
+		labelMesh.rotation.z = Math.PI
+		labelMesh.nodeInfo = node
+		labelMesh.meshType = 'label'
+		labelMesh.renderOrder = 3
+		scene.add(labelMesh)
 
 		var lineMaterial = getBorderLineMaterial(color)
-		let x = nodeMesh.position.x - node.width / 2
-		let y = nodeMesh.position.y - node.height / 2
+		let x = labelMesh.position.x - node.width / 2
+		let y = labelMesh.position.y - node.height / 2
 		var points = []
 		points.push( new THREE.Vector3( x, y, 0 ) )
 		points.push( new THREE.Vector3( x + node.width, y, 0 ) )
@@ -381,9 +276,29 @@ function drawNode(layout_data) {
 		lineLine.material = lineMaterial
 		lineLine.renderOrder = 1
 		lineLine.nodeInfo = node
-		lineLine.meshType = 'line'
+		lineLine.meshType = 'border'
 		scene.add( lineLine )
 	})
+}
+
+const drawLableMaterial = (node, color, backgroundColor) => {
+	const type = node.id + color
+	if (!labelMaterialMap[type]) {
+		let canvas = document.createElement('canvas')
+		canvas.width = node.width
+		canvas.height = node.height
+		let ctx = canvas.getContext('2d')
+		ctx.fillStyle = backgroundColor
+		ctx.fillRect(0, 0, node.width, node.height)
+		ctx.font = '70px sans-serif'
+		ctx.fillStyle = color
+		let width = ctx.measureText(node.label).width
+		ctx.fillText(node.label, (node.width - width) / 2, 70 + 20)
+
+		let material = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(canvas, undefined, undefined, undefined, undefined, THREE.LinearFilter)})
+		labelMaterialMap[type] = material
+	}
+	return labelMaterialMap[type]
 }
 
 function getBorderLineMaterial(color) {
