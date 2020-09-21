@@ -7,7 +7,7 @@
     "start": "glue start",
     "compile": "rm -rf ./lib && babel src/modules --out-dir lib --copy-files",
     "login": "npm login --registry=https://registry.npmjs.org",
-    "publish": "login && npm publish --registry=https://registry.npmjs.org"
+    "publish": "npm publish --registry=https://registry.npmjs.org"
   },
   "keywords": [
     "dagre",
