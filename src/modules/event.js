@@ -47,7 +47,7 @@ export default (scene, camera, defaultOptions) => {
 	// let threeBox = defaultOptions.dom
 
 	threeBoxCanvas.addEventListener("mousedown",(event) => {
-		if(!defaultOptions.onNodeClick){return}
+		if(!defaultOptions.onNodeClick && !defaultOptions.onEmptyClick){return}
 		event.preventDefault()
 		mouseDownX = event.clientX
 		mouseDownY = event.clientY
@@ -55,7 +55,7 @@ export default (scene, camera, defaultOptions) => {
 
 	// 鼠标点击节点时交互
 	threeBoxCanvas.addEventListener("mouseup",(event) => {
-		if(!defaultOptions.onNodeClick){return}
+		if (!defaultOptions.onNodeClick && !defaultOptions.onEmptyClick) { return }
 		event.preventDefault()
 		// 如果mousedown和mouseup在同一位置，则认为是点击，触发点击事件，button=0为左键点击
 		if(event.button === 0 && event.clientX === mouseDownX && event.clientY === mouseDownY){
@@ -66,11 +66,13 @@ export default (scene, camera, defaultOptions) => {
 			let meshArr = intersects.filter(node=>node.object.meshType==="label")
 			let selectedNodes = meshArr.map(node=>node.object.nodeInfo)
 
-			if(selectedNodes.length>0){   // 如果有点击对象
-				let {x, y} = getNodeScreenPointer(meshArr[0], camera)
+			if (selectedNodes.length > 0) {   // 如果有点击对象
+				let { x, y } = getNodeScreenPointer(meshArr[0], camera)
 				defaultOptions.onNodeClick({
-					x,y,node: selectedNodes[0]
-				})
+					x, y, node: selectedNodes[0]
+				}, event)
+			} else if (defaultOptions.onEmptyClick) {
+				defaultOptions.onEmptyClick(event)
 			}
 		}
 	})
@@ -90,15 +92,15 @@ export default (scene, camera, defaultOptions) => {
 			let {x, y} = getNodeScreenPointer(meshArr[0], camera)
 			defaultOptions.onNodeHover({
 				x,y,node: selectedNodes[0]
-			})
+			}, event)
 		}else if(defaultOptions.onEmptyHover){
-			defaultOptions.onEmptyHover()
+			defaultOptions.onEmptyHover(event)
 		}
 	})
 
 	// 鼠标右键交互
 	threeBoxCanvas.addEventListener("contextmenu",(event) => {
-		if(!defaultOptions.onNodeRightClick){return}
+		if (!defaultOptions.onNodeRightClick && !defaultOptions.onEmptyRightClick) { return }
 		event.preventDefault()
 		let mouse = initMouseVector(event)
 		mouseVector.set(mouse.mouseX, mouse.mouseY)
@@ -110,7 +112,9 @@ export default (scene, camera, defaultOptions) => {
 			let {x, y} = getNodeScreenPointer(meshArr[0], camera)
 			defaultOptions.onNodeRightClick({
 				x,y,node: selectedNodes[0]
-			})
+			}, event)
+		}else if(defaultOptions.onEmptyRightClick){
+			defaultOptions.onEmptyRightClick(event)
 		}
 	})
 }

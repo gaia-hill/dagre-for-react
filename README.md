@@ -153,21 +153,29 @@ const graph = dagreGraphInit(config)
 
 dagre 的布局配置，具体的配置参考链接中 graph 的配置<https://github.com/dagrejs/dagre/wiki#configuring-the-layout>
 
-#### - onNodeHover（function({x,y,node})）
+#### - onNodeHover（function({x,y,node}, e)）
 
-节点 hover 事件回调函数，可接收 x,y,node 参数，x、y 为当前节点对应的 dom 坐标，node 为关系图中当前节点的信息
+节点 hover 事件回调函数，可接收 x,y,node 参数，x、y 为当前节点相对于canvas元素偏移位置，node 为关系图中当前节点的信息
 
-#### - onEmptyHover（function）
+#### - onEmptyHover（function(e)）
 
 图中非节点处 hover 事件回调函数
 
-#### - onNodeClick（function({x,y,node})）
+#### - onNodeClick（function({x,y,node}, e)）
 
-节点点击事件回调函数，可接收 x,y,node 参数，x、y 为当前节点对应的 dom 坐标，node 为关系图中当前节点的信息
+节点点击事件回调函数，可接收 x,y,node 参数，x、y 为当前节点相对于canvas元素偏移位置，node 为关系图中当前节点的信息
+
+#### - onEmptyClick（function(e)）
+
+图中非节点处 click 事件回调函数
 
 #### - onNodeRightClick（function({x,y,node})）
 
-节点右键点击事件回调函数，可接收 x,y,node 参数，x、y 为当前节点对应的 dom 坐标，node 为关系图中当前节点的信息
+节点右键点击事件回调函数，可接收 x,y,node 参数，x、y 为当前节点相对于canvas元素偏移位置，node 为关系图中当前节点的信息
+
+#### - onEmptyRightClick（function(e)）
+
+图中非节点处 右键click 事件回调函数
 
 #### - onInit（function(graph)）（react 组件方式特有）
 

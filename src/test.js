@@ -63,8 +63,14 @@ class Index extends Component {
 			onNodeClick: ({ x, y, node }) => {
 				console.log('当前点击节点', x, y, node)
 			},
+			onEmptyClick: (e) => {
+				console.log('空白点击')
+			},
 			onNodeRightClick: ({ x, y, node }) => {
 				console.log('当前右键点击节点', x, y, node)
+			},
+			onEmptyRightClick: (e) => {
+				console.log('空白右键点击')
 			}
 		}
 	}
