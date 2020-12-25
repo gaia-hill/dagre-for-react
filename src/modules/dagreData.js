@@ -37,12 +37,14 @@ export default class DagreData {
 
 		dagre.layout(graph)
 
+		let center = options.center || [0, 0]
+
 		let layoutData = {
 			nodes: [],
 			edges: [],
 			center: {
-				centerX: 0,
-				centerY: 0
+				centerX: center[0] ? center[0] : 0,
+				centerY: center[1] ? center[1] : 0
 			}
 		}
 
@@ -50,8 +52,8 @@ export default class DagreData {
 			let layoutNode = graph.node(node)
 			if (layoutNode && layoutNode.nodeType === 'main') {
 				layoutData.center = {
-					centerX: 0 - layoutNode.x,
-					centerY: 0 - layoutNode.y
+					centerX: layoutData.center.centerX - layoutNode.x,
+					centerY: layoutData.center.centerY - layoutNode.y
 				}
 				layoutData.main = layoutNode
 			}

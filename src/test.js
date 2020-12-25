@@ -11,7 +11,7 @@ class Index extends Component {
 			maxZoom: 1.5,
 			height: '700px',
 			width: '900px',
-			layoutConfig: {},
+			// center: [1000, 1000],
 			theme: {
 				mainNode: '#FFFFFF',
 				mainBkg: '#658FFC',

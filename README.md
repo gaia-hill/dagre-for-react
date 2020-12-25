@@ -22,6 +22,7 @@ const config = {
   height: '700px',
   width: '900px',
   layoutConfig: {},
+  center: [0, 0],
   theme: {
     mainNode: '#FFFFFF',
     mainBkg: '#2E86C1',
@@ -123,6 +124,10 @@ const graph = dagreGraphInit(config)
 #### - maxZoom（number）
 
 最小的缩放级别，默认为 1.5
+
+#### - center（[x, y]）
+
+设置图绘制的中心点，默认[0, 0]，中心位置
 
 #### - senceBackground（string）
 
